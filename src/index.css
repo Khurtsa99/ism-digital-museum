@@ -261,3 +261,33 @@ a.teacher-card:hover { transform: translateY(-4px); box-shadow: 0 10px 26px rgba
 .photo-admin .link { margin-left: 0; text-align: left; }
 .progress { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; margin-bottom: 4px; }
 .progress > div { height: 100%; background: var(--blue); transition: width .2s; }
+/* ===== Тэнхимийн түүх ===== */
+.hist-hero { background: var(--blue); color: var(--white); border-radius: 14px; padding: 40px 32px; margin-bottom: 22px; }
+.hist-hero h1 { color: var(--white); margin: 0 0 8px; font-size: clamp(30px, 5vw, 44px); }
+.hist-hero p { margin: 0 0 18px; color: #dcd8ff; max-width: 560px; }
+.hist-stats { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+.hist-stats div { flex: 1 1 140px; background: var(--soft); border-top: 4px solid var(--blue); padding: 14px 16px; border-radius: 6px; }
+.hist-stats b { display: block; font: 700 30px Georgia, serif; color: var(--blue); }
+.hist-stats span { color: var(--muted); font-size: 14px; }
+.hist-index { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 26px; position: sticky; top: 60px; background: var(--white); padding: 10px 0; z-index: 5; border-bottom: 1px solid var(--line); }
+.hist-index a { border: 1.5px solid var(--blue); color: var(--blue); padding: 4px 12px; border-radius: 999px; text-decoration: none; font-size: 14px; }
+.hist-index a:hover { background: var(--blue); color: var(--white); }
+.hist-list { list-style: none; margin: 0; padding: 0; }
+.hist-item { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: center; margin-bottom: 34px; scroll-margin-top: 130px; }
+.hist-item:not(:has(img)) { grid-template-columns: 1fr; }
+.hist-item img { width: 100%; max-height: 320px; object-fit: cover; border-radius: 12px; box-shadow: 0 2px 14px rgba(20, 0, 198, .18); }
+.hist-item.flip img { order: 2; }
+.hist-text { border-left: 4px solid var(--blue); padding-left: 20px; }
+.hist-phase { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.hist-year { font: 700 46px/1.1 Georgia, serif; color: var(--blue); }
+.hist-text h2 { margin: 4px 0 10px; font-size: 22px; }
+.hist-text p { margin: 0 0 10px; }
+@media (max-width: 760px) {
+  .hist-item { grid-template-columns: 1fr; }
+  .hist-item.flip img { order: 0; }
+}
+/* Миний бүтээлүүд: нүүр зурагтай карт */
+.my-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.my-card { background: var(--soft); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.my-card img, .my-card .img-placeholder { width: 100%; aspect-ratio: 3 / 2; height: auto; object-fit: cover; display: block; }
+.my-card .link { margin-left: 0; margin-right: 14px; }

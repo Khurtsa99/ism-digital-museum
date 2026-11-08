@@ -21,15 +21,19 @@ export default function MyExhibits() {
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
 
   async function load() {
-    const { data, error } = await supabase.from('exhibits').select('*')
-      .eq('creator_id', user.id).order('created_at', { ascending: false })
+    const { data, error } = await supabase
+      .from('exhibits')
+      .select('*, exhibition_categories(name)')
+      .eq('creator_id', user.id)
+      .order('created_at', { ascending: false })
     if (error) setError(error.message)
     else setItems(data)
   }
 
   useEffect(() => {
     load()
-    supabase.from('exhibition_categories').select('*').order('name').then(({ data }) => setCategories(data ?? []))
+    supabase.from('exhibition_categories').select('*').order('name')
+      .then(({ data }) => setCategories(data ?? []))
     // eslint-disable-next-line
   }, [])
 
@@ -58,7 +62,8 @@ export default function MyExhibits() {
       : await supabase.from('exhibits').insert(payload)
     if (error) return setError(error.message)
     setMsg(editingId ? 'Өөрчлөлт хадгалагдлаа.' : 'Бүтээл нэмэгдлээ.')
-    setForm(EMPTY); setEditingId(null)
+    setForm(EMPTY)
+    setEditingId(null)
     load()
   }
 
@@ -79,20 +84,36 @@ export default function MyExhibits() {
     <>
       <h1>Миний бүтээлүүд</h1>
       <p><Link to="/profile">Профайлаа засах</Link></p>
+
       <form className="form" onSubmit={save}>
-        <label>Гарчиг *<input value={form.title} onChange={(e) => set('title', e.target.value)} /></label>
-        <label>Тайлбар<textarea rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} /></label>
+        <label>Гарчиг *
+          <input value={form.title} onChange={(e) => set('title', e.target.value)} />
+        </label>
+        <label>Тайлбар
+          <textarea rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} />
+        </label>
         <label>Ангилал
           <select value={form.category_id} onChange={(e) => set('category_id', e.target.value)}>
             <option value="">— сонгох —</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </label>
-        <label>Ашигласан технологи<input placeholder="React, Supabase" value={form.technology_stack} onChange={(e) => set('technology_stack', e.target.value)} /></label>
-        <label>Бүтээсэн он<input type="number" value={form.year_created} onChange={(e) => set('year_created', e.target.value)} /></label>
-        <label>Demo холбоос<input value={form.demo_url} onChange={(e) => set('demo_url', e.target.value)} /></label>
-        <label>GitHub холбоос<input value={form.github_url} onChange={(e) => set('github_url', e.target.value)} /></label>
-        <label>Зураг<ImageInput value={form.image_url} onChange={(u) => set('image_url', u)} folder="exhibits" /></label>
+        <label>Ашигласан технологи
+          <input placeholder="React, Supabase" value={form.technology_stack}
+            onChange={(e) => set('technology_stack', e.target.value)} />
+        </label>
+        <label>Бүтээсэн он
+          <input type="number" value={form.year_created} onChange={(e) => set('year_created', e.target.value)} />
+        </label>
+        <label>Demo холбоос
+          <input value={form.demo_url} onChange={(e) => set('demo_url', e.target.value)} />
+        </label>
+        <label>GitHub холбоос
+          <input value={form.github_url} onChange={(e) => set('github_url', e.target.value)} />
+        </label>
+        <label>Нүүр зураг (карт дээр харагдана)
+          <ImageInput value={form.image_url} onChange={(u) => set('image_url', u)} folder="exhibits" />
+        </label>
         <label>Төлөв
           <select value={form.status} onChange={(e) => set('status', e.target.value)}>
             <option value="published">Нийтлэх</option>
@@ -101,27 +122,42 @@ export default function MyExhibits() {
         </label>
         <div className="row">
           <button className="btn">{editingId ? 'Өөрчлөлт хадгалах' : 'Бүтээл нэмэх'}</button>
-          {editingId && <button type="button" className="btn btn-light" onClick={() => { setEditingId(null); setForm(EMPTY) }}>Болих</button>}
+          {editingId && (
+            <button type="button" className="btn btn-light"
+              onClick={() => { setEditingId(null); setForm(EMPTY) }}>
+              Болих
+            </button>
+          )}
         </div>
         {error && <p className="error">{error}</p>}
         {msg && <p className="success">{msg}</p>}
       </form>
 
       <h2>Нэмсэн бүтээлүүд</h2>
-      {items.length === 0 ? <p className="empty">Та хараахан бүтээл нэмээгүй байна. Дээрх маягтаас эхлээрэй.</p> : (
-        <table className="table">
-          <tbody>
-            {items.map((it) => (
-              <tr key={it.id}>
-                <td>{it.title} {it.status === 'draft' && <small>(ноорог)</small>}</td>
-                <td className="actions">
+      {items.length === 0 ? (
+        <p className="empty">Та хараахан бүтээл нэмээгүй байна. Дээрх маягтаас эхлээрэй.</p>
+      ) : (
+        <div className="my-grid">
+          {items.map((it) => (
+            <article className="my-card" key={it.id}>
+              {it.image_url
+                ? <img src={it.image_url} alt={it.title} />
+                : <div className="img-placeholder">Нүүр зураггүй</div>}
+              <div className="card-body">
+                <h3>{it.title} {it.status === 'draft' && <small>(ноорог)</small>}</h3>
+                <p className="meta">
+                  {it.exhibition_categories?.name ?? 'Ангилалгүй'}
+                  {it.year_created ? ` · ${it.year_created} он` : ''}
+                </p>
+                <div className="row">
                   <button className="link" onClick={() => edit(it)}>Засах</button>
+                  <Link className="link" to={`/exhibits/${it.id}`}>Үзэх</Link>
                   <button className="link danger" onClick={() => remove(it)}>Устгах</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
       )}
     </>
   )
